@@ -413,3 +413,26 @@ def get_margin(model, loader, num_batches = 10):
     print("The average margin is {0} and the min margin is {1}".format(ave_margin, min_margin))
     
     return margins, ave_margin, min_margin
+
+
+def eval_model(model_tst, loader_tst, dataset_name):
+    print("Test the model")
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    model_tst.eval()
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for images, labels in loader_tst:
+            images = images.to(device)
+            labels = labels.to(device)
+            outputs = model_tst(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+            # print(total)
+
+        print('Test Accuracy of the model on the ' + dataset_name + ' : {} %'.format(100 * correct / total))
+
+    return 100 * correct / total
