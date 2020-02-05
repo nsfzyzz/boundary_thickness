@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="1af1f632-dcfa-458c-852c-dcf16d23e520" name="boundary" url="http://128.32.43.69">
+        <fileTransfer host="128.32.43.69" port="22" rootFolder="/home/yaodong/boundary-robustness" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
