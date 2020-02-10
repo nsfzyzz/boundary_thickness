@@ -9,7 +9,8 @@ from torchvision import datasets, transforms
 
 from utils import *
 from resnet_cifar import resnet20_cifar, resnet56_cifar
-from models_kuangliu.resnet import ResNet18
+from models_kuangliu.resnet import ResNet18, ResNet50
+from models_kuangliu.resnext import ResNeXt29_32x4d
 from tqdm import tqdm, trange
 
 import torchvision.utils
@@ -34,10 +35,8 @@ torch.cuda.manual_seed(seed)
 train_loader, test_loader = getData(name=name, train_bs=batch_size, test_bs=test_batch_size)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device
 
 model = ResNet18()
-model.linear = nn.Linear(in_features=512, out_features=11)
 model = model.to(device)
 
 model = torch.nn.DataParallel(model)
@@ -46,11 +45,10 @@ print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/10
 eval_model(model, test_loader, "original test images")
 
 ## Mixup training
-
 criterion = nn.CrossEntropyLoss()
 
 # Note that here, according to the original mixup repo, the weight_decay should be set smaller
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay = 1e-4)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay = 1e-4)
 
 def update_lr(optimizer, lr):    
     for param_group in optimizer.param_groups:
@@ -60,9 +58,9 @@ def update_lr(optimizer, lr):
 num_epochs = 200
 Loss_list = []
 best_acc = 0.0
-noise_sd = 2.0
+noise_sd = 1.0
 
-alpha = 1
+alpha = 1.0
 use_cuda = torch.cuda.is_available()
 total_step = len(train_loader)
 
@@ -80,23 +78,6 @@ for epoch in range(num_epochs):
     update_lr(optimizer, lr)
 
     for i, (inputs, targets) in enumerate(train_loader):
-
-        # generate random inputs
-        inputs_random = torch.rand_like(inputs) * noise_sd
-        inputs_random = inputs_random[:int(batch_size*0.5)]
-        # normalize
-        inputs_random[:, 0, :, :] = (inputs_random[:, 0, :, :] - 0.4914) / 0.2023
-        inputs_random[:, 1, :, :] = (inputs_random[:, 1, :, :] - 0.4822) / 0.1994
-        inputs_random[:, 2, :, :] = (inputs_random[:, 2, :, :] - 0.4465) / 0.2010
-
-        # noise is the 11-th class
-        targets_random = torch.ones_like(targets) * 10.0
-        targets_random = targets_random[:int(batch_size*0.5)]
-
-
-        inputs = torch.cat([inputs, inputs_random])
-        targets = torch.cat([targets, targets_random.long()])
-
         inputs = inputs.to(device)
         targets = targets.to(device)
         # generate mixed inputs, two one-hot label vectors and mixing coefficient
@@ -125,8 +106,8 @@ for epoch in range(num_epochs):
                 'net': model.state_dict(),
                 'acc': acc,
             }
-            if not os.path.isdir('checkpoint-mixup-halfnoise{}'.format(noise_sd)):
-                os.mkdir('checkpoint-mixup-halfnoise{}'.format(noise_sd))
-            torch.save(state, './checkpoint-mixup-halfnoise{}/ResNet18_mixup_{}.pth'.format(noise_sd, epoch))
+            if not os.path.isdir('checkpoint-mixup'):
+                os.mkdir('checkpoint-mixup')
+            torch.save(state, './checkpoint-mixup/ResNet18_mixup_{}.pth'.format(epoch))
 print('acc :', acc)
 
