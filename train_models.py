@@ -34,7 +34,6 @@ parser.add_argument('--test-batch-size', type=int, default=200, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', type=int, default=1000, metavar='N',
                     help='number of epochs to train (default: 10)')
-
 parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--lr-decay', type=float, default=0.2,
@@ -57,8 +56,8 @@ parser.add_argument('--large-ratio', type=int, default=1, metavar='N',
                     help='large ratio')
 parser.add_argument('--depth', type=int, default=20,
             help='choose the depth of resnet')
-parser.add_argument('--saving-folder', type=str, default='resnet',
-            help='choose the archtecure')
+parser.add_argument('--saving-folder', type=str, default='',
+            help='the folder to save your model')
 parser.add_argument('--resize', action='store_true',
                     help='evaluate model on validation set')
 args = parser.parse_args()
@@ -82,7 +81,14 @@ model_list = {
     'resnet56': resnet56_cifar(),
     'resnet110': resnet110_cifar(),
     'ResNet18': ResNet18(),
-    'ResNet50': ResNet50_with_link()
+    'ResNet18_no_residual_link': ResNet18_without_link(),
+    'ResNet50': ResNet50_with_link(),
+    'ResNet50_no_residual_link': ResNet50_without_link(),
+    'DenseNet': densenet_cifar(),
+    'VGG11': VGG('VGG11'),
+    'VGG13': VGG('VGG13'),
+    'VGG16': VGG('VGG16'),
+    'VGG19': VGG('VGG19')
 }
 
 model = model_list[args.arch].cuda()
