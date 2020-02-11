@@ -36,7 +36,7 @@ device
             
 model = resnet56_cifar().cuda()
 model = torch.nn.DataParallel(model)
-file_path = "../checkpoint/resnet56_cifar_300.pkl"
+file_path = "./checkpoint/resnet56_cifar_300.pkl"
 model.load_state_dict(torch.load(file_path))
 
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))

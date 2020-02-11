@@ -455,7 +455,7 @@ def run_many(PGD_attack,
                 if img_ind == -1:
                     # This means that this batch does not contain any image of this particular class
                     print("No img of label {0}! Go to the next batch.".format(specific_class))
-                    # So, go to the nect batch
+                    # So, go to the next batch
                     continue
             
             x = images[img_ind]

@@ -1,6 +1,4 @@
-# Note that this is not the original model zoo file
-# This file uses the model_zoo.py
-# The models'names have been changed
+# This file contains all the models used in the experiment
 
 from __future__ import print_function
 import numpy as np
@@ -242,7 +240,7 @@ def return_transforms(data_type):
             transforms.ToTensor(),
         ])
 
-    elif data_type == "adv_model_yaodong":
+    elif data_type == "adv_model_not_normalized":
 
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
@@ -270,67 +268,67 @@ def return_transforms(data_type):
         
     return transform_train, transform_test
 
-exp_name_list = {0: "ResNet18 Mixup (epoch-599)",
-                1: "resnet32_cifar using Trades trained for 80 epochs (aided by epoch-100)",
-                2: "ResNet50 with residual links (epoch-600)",
-                3: "VGG11 (epoch-900)",
-                4: "ResNet50 without residual links (epoch-600)",
-                5: "resnet56_cifar with weight decay (epoch-500)",
-                6: "resnet20_cifar with weight decay (epoch-500)",
-                7: "ResNet18 with weight decay (100 epochs)",
-                8: "ResNet18 without weight decay (900 epochs)",
-                9: "VGG19 (epoch-900)",
-                10: "VGG13 (epoch-900)",
-                11: "VGG16 (epoch-900)",
-                12: "ResNet18 with weight decay (epoch-683)",
-                13: "ResNet18 without residual links (epoch-600)",
-                14: "DenseNet cifar (epoch-900)",
-                15: "resnet110_cifar with weight decay (epoch-500)",
-                16: "AlexNet cifar (epoch-900) without weight decay",
-                17: "resnet32_cifar with weight decay (epoch-500)",
-                18: "resnet44_cifar with weight decay (epoch-500)",
-                19: "resnet20_cifar without weight decay (900 epochs)",
-                20: "resnet32_cifar without weight decay (900 epochs)",
-                21: "resnet44_cifar without weight decay (900 epochs)",
-                22: "resnet56_cifar without weight decay (900 epochs)",
-                23: "resnet110_cifar without weight decay (900 epochs)",
-                24: "AlexNet cifar with weight decay (epoch-500)",
-                25: "DenseNet 121 (epoch-900)",
-                26: "ResNet18 with Mixup training (epoch-600)"
+exp_name_list = {0: "ResNet18 Mixup",
+                1: "resnet32_cifar using Trades (aided by epoch-100)",
+                2: "ResNet50 with residual links",
+                3: "VGG11",
+                4: "ResNet50 without residual links",
+                5: "resnet56_cifar with weight decay",
+                6: "resnet20_cifar with weight decay",
+                7: "ResNet18 with weight decay",
+                8: "ResNet18 without weight decay",
+                9: "VGG19",
+                10: "VGG13",
+                11: "VGG16",
+                12: "ResNet18 with weight decay",
+                13: "ResNet18 without residual links",
+                14: "DenseNet cifar",
+                15: "resnet110_cifar with weight decay",
+                16: "AlexNet cifar without weight decay",
+                17: "resnet32_cifar with weight decay",
+                18: "resnet44_cifar with weight decay",
+                19: "resnet20_cifar without weight decay",
+                20: "resnet32_cifar without weight decay",
+                21: "resnet44_cifar without weight decay",
+                22: "resnet56_cifar without weight decay",
+                23: "resnet110_cifar without weight decay",
+                24: "AlexNet cifar with weight decay",
+                25: "DenseNet 121",
+                26: "ResNet18 with Mixup training"
                 }
 
 
-short_name_list = {0: "R18 Mx (e599)",
-                1: "r32 Trades (e80)",
-                2: "R50(e600)",
-                3: "VGG11 (e900)",
-                4: "R50-nolink (e600)",
-                5: "r56 (e500)",
-                6: "r20 (e500)",
-                7: "R18 (e100)",
-                8: "R18-nd (e900)",
-                9: "VGG19 (e900)",
-                10: "VGG13 (e900)",
-                11: "VGG16 (e900)",
-                12: "R18 (e683)",
-                13: "R18-nolink (e600)",
-                14: "D cifar (e900)",
-                15: "r110 (ep500)",
-                16: "A-nd e900",
-                17: "r32 (e500)",
-                18: "r44 (e500)",
-                19: "r20-nd (e900)",
-                20: "r32-nd (e900)",
-                21: "r44-nd (e900)",
-                22: "r56-nd (e900)",
-                23: "r110-nd (e900)",
-                24: "A e500",
-                25: "D121 (e900)",
-                26: "R18 Mx new (e599)"
+short_name_list = {0: "R18 Mx",
+                1: "r32 Trades",
+                2: "R50",
+                3: "VGG11",
+                4: "R50-nolink",
+                5: "r56",
+                6: "r20",
+                7: "R18",
+                8: "R18-nd",
+                9: "VGG19",
+                10: "VGG13",
+                11: "VGG16",
+                12: "R18",
+                13: "R18-nolink",
+                14: "D cifar",
+                15: "r110",
+                16: "A-nd",
+                17: "r32",
+                18: "r44",
+                19: "r20-nd",
+                20: "r32-nd",
+                21: "r44-nd",
+                22: "r56-nd",
+                23: "r110-nd",
+                24: "A",
+                25: "D121",
+                26: "R18 Mx new"
                 }
 
 data_type_list = {0: "normal",
-                 1: "adv_model_yaodong",
+                 1: "adv_model_not_normalized",
                  2: "normal",
                  3: "normal",
                  4: "normal",

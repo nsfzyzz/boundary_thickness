@@ -59,7 +59,7 @@ test_acc_list = []
 # load model
 model = ResNet18()
 # comment the following line if the model is trained by original mixup
-model.linear = nn.Linear(in_features=512, out_features=11)
+#model.linear = nn.Linear(in_features=512, out_features=11)
 model = model.to(device)
 model = torch.nn.DataParallel(model)
 # define model path
