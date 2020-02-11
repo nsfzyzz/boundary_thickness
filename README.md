@@ -2,26 +2,33 @@
 
 To test the functions used in the paper, execute the code in the folder Experiment_code
 
-Evaluate the model robustness:
+# Evaluate the model robustness:
 
 python eval_models_blackbox.py
 python eval_models_ood.py
 python eval_models_whitebox.py
 
-Measure boundary thickness
+# Measure boundary thickness
 
 python measure_boundary_thickness
 
-Train a model
+# Train a model
 
 python train_models.py --saving-folder [Your_folder] --arch [Your_model_choice]
 
-Train the two mixup models and compare
+# Train the two mixup models and compare
 
 python train-mixup-random-noise.py
 python train-mixup.py
 
-See an example of visualizing 3D decision boundary
+# See an example of visualizing 3D decision boundary
 
 python visualize_3D.py
 
+# See the chessboard example
+
+jupyter notebook does-chess-board-have-boundary-tilting.ipynb
+
+# See how we measure the non-robust feature score
+
+jupyter notbeook measure_non_robust_feature_score.ipynb
