@@ -48,8 +48,9 @@ train_bs=128
 test_bs=32
 
 test_acc_list = []
+test_epoch_list = {}
 
-for exp_ind in range(26):
+for exp_ind in range(31,32):
 
     print("Experiement {0}: {1}".format(exp_ind, exp_name_list[exp_ind]))
 
@@ -72,7 +73,35 @@ for exp_ind in range(26):
     test_acc = test(model, test_loader)
     test_acc_list.append(test_acc)
     
-margin_results = {"test_accs": test_acc_list}
+    if exp_ind in models_in_training["exp_ids"]:
+        
+        print("Start checking the results in all epochs!!!")
+        
+        epoch_list = return_epoch_list(exp_ind)
+        
+        test_acc_list_epochs = []
+        
+        for epoch_num in epoch_list:
+            
+            print("Experiement {0}: epoch-{1}".format(exp_ind, epoch_num))
+            
+            loc_epoch(exp_ind, epoch_num)
+            
+            model = model_list[exp_ind].cuda()
+            model = torch.nn.DataParallel(model)
+            resume = loc_epoch(exp_ind, epoch_num)
+            load_model = switcher.get(exp_ind, "nothing")
+            load_model(model, resume)
+            print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
+            print("Finished loading {0}".format(resume))
+
+            test_acc = test(model, test_loader)
+            test_acc_list_epochs.append(test_acc)
+        
+        test_epoch_list[exp_ind] = test_acc_list_epochs
+        
+    
+margin_results = {"test_accs": test_acc_list, "test_epoch_accs": test_epoch_list}
     
 import pickle
 f = open("test_accs_model_zoo.pkl","wb")

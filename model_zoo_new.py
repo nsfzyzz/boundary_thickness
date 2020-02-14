@@ -48,40 +48,54 @@ model_list = {0:ResNet18(),
               23: resnet110_cifar(),
               24: Alex_Net(),
               25: DenseNet121(),
-              26: ResNet18()
+              26: resnet20_cifar(),
+              27: resnet20_cifar(),
+              28: resnet56_cifar(),
+              29: VGG("VGG11"),
+              30: resnet20_cifar(),
+              31: ResNet18()
              }
 
-suffix_list = ["R18Mx(e599)","r32Trades(e80)","R50(e600)","VGG11(e900)","R50-nolink(e600)","r56(e500)","r20(e500)","R18(e100)","R18-nd(e900)","VGG19(e900)","VGG13(e900)","VGG16(e900)","R18(e683)","R18-nolink(e600)","Dcifar(e900)","r110(ep500)","A-nd(e900)","r32(e500)","r44(e500)","r20-nd(e900)","r32-nd(e900)","r44-nd(e900)","r56-nd(e900)","r110-nd(e900)","A(e500)","D121(e900)"]
+suffix_list = ["R18Mx(e599)","r32Trades(e80)","R50(e600)","VGG11(e900)","R50-nolink(e600)","r56(e500)","r20(e500)","R18(e100)","R18-nd(e900)","VGG19(e900)","VGG13(e900)","VGG16(e900)","R18(e683)","R18-nolink(e600)","Dcifar(e900)","r110(ep500)","A-nd(e900)","r32(e500)","r44(e500)","r20-nd(e900)","r32-nd(e900)","r44-nd(e900)","r56-nd(e900)","r110-nd(e900)","A(e500)","D121(e900)","resnet_adv_cifar_r56_to_r20","resnet_adv_cifar_r56_to_r20_e100","r56Mx(e599)","VGG11Mx(e599)","r20Mx(e599)","R18-adv(e120)"]
+
 
 loc_list = {}
 
-for i in range(26):
+for i in range(32):
     loc_list[i] = "../model_zoo/{0}.pkl".format(suffix_list[i])
 
 def return_epoch_list(exp_id):
     
-    if exp_id == 26:
+    if exp_id in [0, 28, 29, 30]:
         return [5, 9, 14, 19, 24, 49, 74, 99, 149, 199, 249, 299, 399, 499, 599]
+    elif exp_id == 31:
+        return [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]
     else:
         return [5, 10, 15, 20, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600]
 
+models_in_training = {"exp_ids": [0, 3, 5, 6, 8, 11, 12, 16, 19, 22, 24, 28, 29, 30, 31]}
     
 def loc_epoch(exp_id, epoch_num):
     loc_epoch_list = {
+             0: '../model_zoo/ResNet18_mixup/ckpt_{0}.pth',
              3: '../model_zoo/VGG11/ckpt_{0}.pth',
+             5: '../model_zoo/resnet56_WDpatch/net_{0}.pkl',
              6: '../model_zoo/resnet20_WDpatch/net_{0}.pkl',
               8: '../model_zoo/ResNet18_noweight_decay/net_{0}.pkl',
               11: '../model_zoo/VGG16/ckpt_{0}.pth',
               12: '../model_zoo/ResNet18_weight_decay/net_{0}.pkl',
               16: '../model_zoo/alex_cifar10_exp2/net_{0}.pkl',
               19: '../model_zoo/resnet20/net_{0}.pkl',
+              22: '../model_zoo/resnet56/net_{0}.pkl',
               24: '../model_zoo/alex_WDpatch/net_{0}.pkl',
-              26: '../model_zoo/ResNet18_mixup/ckpt_{0}.pth'
-
+              28: '../model_zoo/resnet56_mixup/resnet_cifar_mixup_large_{0}.pth',
+              29: '../model_zoo/VGG11_mixup/ckpt_{0}.pth',
+              30: '../model_zoo/resnet20_mixup/ckpt_{0}.pth',
+              31: '../model_zoo/ResNet18_adv/ckpt_{0}.pth'
              }
-    return loc_epoch_list[exp_id].format(epoch_num)
+    return loc_epoch_list[exp_id].format(epoch_num) 
     
-
+    
 def load0(model, resume):
     model.load_state_dict(torch.load(f"{resume}")['net'])
     return
@@ -190,6 +204,26 @@ def load26(model, resume):
     model.load_state_dict(torch.load(f"{resume}")['net'])
     return
 
+def load27(model, resume):
+    model.load_state_dict(torch.load(f"{resume}")['net'])
+    return
+
+def load28(model, resume):
+    model.load_state_dict(torch.load(f"{resume}")['net'])
+    return
+
+def load29(model, resume):
+    model.load_state_dict(torch.load(f"{resume}")['net'])
+    return
+
+def load30(model, resume):
+    model.load_state_dict(torch.load(f"{resume}")['net'])
+    return
+ 
+def load31(model, resume):
+    model.module.load_state_dict(torch.load(f"{resume}"))
+    return          
+                
 switcher = {
         0: load0,
         1: load1,
@@ -217,7 +251,12 @@ switcher = {
         23: load23,
         24: load24,
         25: load25,
-        26: load26
+        26: load26,
+        27: load27,
+        28: load28,
+        29: load29,
+        30: load30,
+        31: load31
     }
 
 
@@ -294,10 +333,14 @@ exp_name_list = {0: "ResNet18 Mixup",
                 23: "resnet110_cifar without weight decay",
                 24: "AlexNet cifar with weight decay",
                 25: "DenseNet 121",
-                26: "ResNet18 with Mixup training"
-                }
-
-
+                26: "(Madry experiment) resnet56 to resnet20",
+                27: "(Madry experiment) resnet56 to resnet20",
+                28: "resnet56_cifar with mixup training",
+                29: "VGG11 with mixup training",
+                30: "resnet20_cifar with mixup training",
+                31: "ResNet18 adversarial training in Madry's setting"
+                } 
+                
 short_name_list = {0: "R18 Mx",
                 1: "r32 Trades",
                 2: "R50",
@@ -324,7 +367,12 @@ short_name_list = {0: "R18 Mx",
                 23: "r110-nd",
                 24: "A",
                 25: "D121",
-                26: "R18 Mx new"
+                26: "Mdy-r56-r20",
+                27: "Mdy-r56-r20-100",
+                28: "r56 Mx",
+                29: "VGG11 Mx",
+                30: "r20 Mx",
+                31: "R18-adv (e120)"
                 }
 
 data_type_list = {0: "normal",
@@ -353,4 +401,9 @@ data_type_list = {0: "normal",
                  23: "normal",
                  24: "normal",
                  25: "normal",
-                 26: "normal"}
+                 26: "normal",
+                 27: "normal",
+                 28: "normal",
+                 29: "normal",
+                 30: "normal",
+                 31: "normal"}
