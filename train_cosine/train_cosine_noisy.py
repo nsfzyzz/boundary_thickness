@@ -29,6 +29,8 @@ parser.add_argument('--resume', '-r', action='store_true',
                     help='resume from checkpoint')
 parser.add_argument('--model', default="ResNet18", type=str,
                     help='model type (default: ResNet18)')
+parser.add_argument('--sigma-shift', default=0, type=float, help='minimum noise standard variance')
+parser.add_argument('--sigma-range', default=0.2, type=float, help='noise standard range')
 parser.add_argument('--name', default='0', type=str, help='name of run')
 parser.add_argument('--seed', default=0, type=int, help='random seed')
 parser.add_argument('--batch-size', default=128, type=int, help='batch size')
@@ -168,7 +170,8 @@ def train(epoch):
         loss_sim = torch.sum(torch.abs(torch.nn.CosineSimilarity()(grad, delta_x)))/delta_x.size(0)
         
         # calculate the noisy data augmentation
-        sigma = np.random.rand(1)[0] * 0.5 + 0.1
+        sigma = np.random.rand(1)[0] * args.sigma_range + args.sigma_shift
+        
         noisy_inputs = inputs_original + sigma * torch.randn_like(inputs_original)
         noisy_outputs = net(noisy_inputs)
         loss_noise = criterion(noisy_outputs, targets_original)
