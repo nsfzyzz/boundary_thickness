@@ -1,26 +1,15 @@
 from __future__ import print_function
-import numpy as np
-import matplotlib.pyplot as plt
 import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
-from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 from utils import *
-from tqdm import tqdm, trange
 from models.resnet import ResNet18
 from models.resnet_cifar import resnet110_cifar
 from models.resnet_CIFAR100 import ResNet18 as ResNet18_CIFAR100
 from models.resnet_cifar_CIFAR100 import resnet110_cifar as resnet110_cifar100
-
-import logging
-import os
-
-from torch.utils.data import TensorDataset
 import pickle
 
 parser = argparse.ArgumentParser(description='Measure pgd error')
@@ -38,33 +27,6 @@ parser.add_argument('--batch-size', type=int, default = 64, help='training bs')
 parser.add_argument('--test-batch-size', type=int, default = 100, help='testing bs')
 
 args = parser.parse_args()
-
-    
-def test(model, test_loader, resize=False, if_adv_distillation_model = False):
-    print('Testing')
-    model.eval()
-    
-    if resize:
-        fake_input = torch.zeros(200, 3, 32, 32).cuda()
-    correct = 0
-    total_num = 0
-    for data, target in test_loader:
-        data, target = data.cuda(), target.cuda()
-        if resize:
-            data_new=F.upsample(data, size=(8,8), mode='bilinear')
-            # print(data_new.size())
-            fake_input[:, :, 12:20, 12:20] = data_new
-            # print(fake_input[:, 10:22, 10:22].size())
-            output = model(fake_input)
-        
-        else:
-            output = model(data)
-        pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
-        correct += pred.eq(target.long().data.view_as(pred)).cpu().sum().item()
-        total_num += len(data)
-    print('testing_correct: ', correct / total_num, '\n')
-    return correct / total_num
-    
 
 def _pgd_blackbox(model_target,
                   model_source,

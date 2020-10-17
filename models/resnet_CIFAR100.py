@@ -1,4 +1,5 @@
 '''ResNet in PyTorch.
+https://github.com/kuangliu/pytorch-cifar
 
 Reference:
 [1] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun

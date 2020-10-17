@@ -1,4 +1,11 @@
-'''VGG11/13/16/19 in Pytorch.'''
+'''VGG11/13/16/19 in Pytorch.
+https://github.com/kuangliu/pytorch-cifar
+
+Reference:
+[1] Karen Simonyan, Andrew Zisserman
+    Very Deep Convolutional Networks for Large-Scale Image Recognition. arXiv:1409.1556
+
+'''
 import torch
 import torch.nn as nn
 

@@ -1,25 +1,13 @@
 from __future__ import print_function
 import numpy as np
-import random
-import matplotlib.pyplot as plt
 import argparse
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
 from torchvision import datasets, transforms
-
-import pickle
-
 from models.resnet import ResNet18
-
 from attack_functions import *
 from utils import *
-from tqdm import tqdm, trange
 
-import os
-from torch.utils.data import TensorDataset
 
 parser = argparse.ArgumentParser(description='Measure boundary thickness')
 parser.add_argument('--eps', type=float, default=1.0, help='Attack size')

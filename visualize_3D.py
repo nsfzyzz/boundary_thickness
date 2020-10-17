@@ -1,25 +1,11 @@
 from __future__ import print_function
-import numpy as np
-import matplotlib.pyplot as plt
-import argparse
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
-from torchvision import datasets, transforms
-from torch.autograd import Variable
 
 from resnet_cifar import resnet56_cifar
 
 from attack_functions import *
 from utils import *
 from visualize_functions import *
-from tqdm import tqdm, trange
-
-import logging
-import os
-import sys
 
 from torch.utils.data import TensorDataset
 from mpl_toolkits.mplot3d import Axes3D
@@ -47,7 +33,6 @@ print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/10
 print("Finished loading {0}".format(file_path))
 
 train_loader, test_loader = getData(name="cifar10", train_bs=train_bs, test_bs=test_bs)
-
 
 test(model, test_loader)
 

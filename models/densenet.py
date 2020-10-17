@@ -1,4 +1,13 @@
-'''DenseNet in PyTorch.'''
+'''DenseNet in PyTorch.
+https://github.com/kuangliu/pytorch-cifar
+
+Reference:
+[1] Gao Huang, Zhuang Liu, Laurens van der Maaten, Kilian Q. Weinberger
+    Densely Connected Convolutional Networks. arXiv:1608.06993
+
+'''
+
+
 import math
 
 import torch

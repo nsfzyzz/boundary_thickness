@@ -2,10 +2,6 @@ from __future__ import print_function
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
-from torch.utils.data import TensorDataset
 from torch.autograd import Variable
 
 
@@ -85,7 +81,7 @@ class Attacks(object):
 
         # print('\n- Save Complete!')
 
-        print("The new version does not save the data files!")
+        print("Return adversarial data.")
 
         adv_data = torch.utils.data.TensorDataset(x, y)
 
@@ -102,74 +98,6 @@ class Attacks(object):
             adv_data = torch.utils.data.TensorDataset(adv_images.float(), adv_labels)
 
         return adv_data
-
-
-class FGSM(Attacks):
-    """
-    FGSM attack in the paper 'Explaining and harnessing adversarial examples'
-    [https://arxiv.org/abs/1412.6572]
-
-    Arguments:
-        model (nn.Module): a model to attack.
-        eps (float): epsilon in the paper. (DEFALUT : 0.007)
-
-    """
-
-    def __init__(self, model, eps=0.007):
-        super(FGSM, self).__init__("FGSM", model)
-        self.eps = eps
-
-    def __call__(self, images, labels):
-        self.model.eval()
-
-        images = images.to(self.device)
-        labels = labels.to(self.device)
-        loss = nn.CrossEntropyLoss()
-
-        self.model.zero_grad()
-        images.requires_grad = True
-        outputs = self.model(images)
-
-        cost = loss(outputs, labels).to(self.device)
-        cost.backward(create_graph=False)
-
-        adv_images = images - self.eps * images.grad.sign()
-        adv_images = torch.clamp(adv_images, min=torch.min(images.data), max=torch.max(images.data)).detach_()
-        # adv_images = torch.clamp(adv_images, min=0, max=1).detach_()
-
-        return adv_images
-
-
-class PGD_linf(Attacks):
-
-    def __init__(self, model, eps=0.3, alpha=2 / 255, iters=40):
-        super(PGD_linf, self).__init__("PGD", model)
-        self.eps = eps
-        self.alpha = alpha
-        self.iters = iters
-
-    def __call__(self, images, labels):
-        images = images.to(self.device)
-        labels = labels.to(self.device)
-        loss = nn.CrossEntropyLoss()
-
-        ori_images = images.data
-
-        for i in range(self.iters):
-            images.requires_grad = True
-            outputs = self.model(images)
-
-            self.model.zero_grad()
-            cost = loss(outputs, labels).to(self.device)
-            cost.backward()
-
-            adv_images = images - self.alpha * images.grad.sign()
-            eta = torch.clamp(adv_images - ori_images, min=-self.eps, max=self.eps)
-            images = torch.clamp(ori_images + eta, min=torch.min(images.data), max=torch.max(images.data)).detach_()
-
-        adv_images = images
-
-        return adv_images
 
 
 class PGD_l2(Attacks):

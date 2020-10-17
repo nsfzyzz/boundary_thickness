@@ -1,23 +1,11 @@
-import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
-from torchvision import datasets, transforms
 import argparse
-
-from utils import *
+import os
 from models.resnet import ResNet18
 from models.resnet_CIFAR100 import ResNet18 as ResNet18_CIFAR100
-from tqdm import tqdm, trange
+from utils import *
 
-import torchvision.utils
-
-import logging
-import os
-
-from torch.utils.data import TensorDataset
 
 parser = argparse.ArgumentParser(description='Training noisy mixup')
 parser.add_argument('--name', type=str, default = "cifar10", help='dataset')
@@ -72,7 +60,7 @@ print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/10
 
 criterion = nn.CrossEntropyLoss()
 
-# Note that here, according to the original mixup repo, the weight_decay should be set as 1e-4
+# We notice that, according to the original mixup repo, the weight_decay should be set as 1e-4
 optimizer = torch.optim.SGD(model.parameters(), lr=args.lr_max, momentum=0.9, weight_decay = 1e-4)
 
 def update_lr(optimizer, lr):    
