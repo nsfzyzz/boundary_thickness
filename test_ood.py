@@ -14,7 +14,7 @@ import pickle
 parser = argparse.ArgumentParser(description='Measure ood error')
 parser.add_argument('--name', type=str, default = "cifar10", help='dataset')
 parser.add_argument('--noise-type', type=str, default = "Noisy", help='type of noise augmentation')
-parser.add_argument('--file-prefix', type=str, default = "ResNet18_mixup", help='stored file name')
+parser.add_argument('--file-prefix', type=str, default = "ResNet18_cifar10_noisy_mixup", help='stored file name')
 parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", help='stored model name')
 parser.add_argument('--batch-size', type=int, default = 64, help='training bs')
 parser.add_argument('--test-batch-size', type=int, default = 100, help='testing bs')
@@ -89,8 +89,8 @@ for c_type in CORRUPTIONS:
     
     print("Testing corruption type {0}".format(c_type))
     
-    X_out = np.load('./augmix/data/cifar/CIFAR-{0}-C/{1}.npy'.format(data_index, c_type))
-    Y_out = np.load('./augmix/data/cifar/CIFAR-{0}-C/labels.npy'.format(data_index))
+    X_out = np.load('../data/ood/cifar/CIFAR-{0}-C/{1}.npy'.format(data_index, c_type))
+    Y_out = np.load('../data/ood/cifar/CIFAR-{0}-C/labels.npy'.format(data_index))
     Y_list = []
     for i in range(50000):
         Y_list.append(Y_out[i])

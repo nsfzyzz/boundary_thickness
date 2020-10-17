@@ -1,15 +1,14 @@
 from __future__ import print_function
 import torch
 
-from resnet_cifar import resnet56_cifar
+from models.resnet_cifar import resnet56_cifar
 
 from attack_functions import *
 from utils import *
-from visualize_functions import *
 
 from torch.utils.data import TensorDataset
-from mpl_toolkits.mplot3d import Axes3D
-import plotly.graph_objects as go
+#from mpl_toolkits.mplot3d import Axes3D
+#import plotly.graph_objects as go
 import plotly
 
 seed = 1
@@ -26,7 +25,7 @@ lens = [[-20, 20],[-20, 20],[-20, 20]]
 
 model = resnet56_cifar().cuda()
 model = torch.nn.DataParallel(model)
-file_path = "./checkpoint/resnet56_cifar_300.pkl"
+file_path = "./checkpoint/resnet56_cifar10.ckpt"
 model.load_state_dict(torch.load(file_path))
 
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))

@@ -21,7 +21,7 @@ parser.add_argument('--num-steps', default=20, type=int,
                     help='perturb number of steps')
 parser.add_argument('--step-size', default=0.0031, type=float,
                     help='perturb step size')
-parser.add_argument('--file-prefix', type=str, default = "ResNet18_mixup", help='stored file name')
+parser.add_argument('--file-prefix', type=str, default = "ResNet18_cifar10_noisy_mixup", help='stored file name')
 parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", help='stored model name')
 parser.add_argument('--batch-size', type=int, default = 64, help='training bs')
 parser.add_argument('--test-batch-size', type=int, default = 100, help='testing bs')

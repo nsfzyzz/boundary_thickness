@@ -10,6 +10,9 @@ from utils import *
 
 
 parser = argparse.ArgumentParser(description='Measure boundary thickness')
+parser.add_argument('--name', type=str, default = "cifar10", help='dataset')
+parser.add_argument('--noise-type', type=str, default = "Noisy", help='type of noise augmentation')
+parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", help='stored model name')
 parser.add_argument('--eps', type=float, default=1.0, help='Attack size')
 parser.add_argument('--alpha', type=float, default=0, help='output lower bound')
 parser.add_argument('--beta', type=float, default=0.75, help='output upper bound')
@@ -18,6 +21,8 @@ parser.add_argument('--step-size', type=float, default=0.2, help='The attack ste
 parser.add_argument('--num-measurements', type=int, default=10, help='The number of thickness measurements/32')
 parser.add_argument('--class-pair', dest='class_pair', default=True, action='store_true',
                     help='calculate the thickness on pairs of classes')
+parser.add_argument('--batch-size', type=int, default = 32, help='training bs')
+parser.add_argument('--test-batch-size', type=int, default = 32, help='testing bs')
 
 args = parser.parse_args()
 
@@ -25,42 +30,36 @@ seed = 1
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 
-train_bs = 32
-test_bs = 32
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device
 
-transform_train = transforms.Compose([
-    transforms.RandomCrop(32, padding=4),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-])
+if args.name == "cifar10":
+    num_classes = 10
+elif args.name == "cifar100":
+    num_classes = 100
+else:
+    raise NameError('The given dataset name is not implemented.')
+    
+train_loader, test_loader = getData(name=args.name, train_bs=args.batch_size, test_bs=args.test_batch_size)
 
-transform_test = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-])
-
-trainset = datasets.CIFAR10(root='../data', train=True, download=True, transform=transform_train)
-train_loader = torch.utils.data.DataLoader(trainset, batch_size=train_bs, shuffle=True)
-testset = datasets.CIFAR10(root='../data', train=False, download=True, transform=transform_test)
-test_loader = torch.utils.data.DataLoader(testset, batch_size=test_bs, shuffle=False)
-
-noise_sd = 1.0
 normalization_factor = 5.0
 
 softmax1 = nn.Softmax()
 
 model = ResNet18()
-resume = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt"
-model.linear = torch.nn.Linear(in_features=512, out_features=11, bias=True)
+
+if args.noise_type == "None":
+    Noisy_mixup = False
+elif args.noise_type == "Noisy":
+    Noisy_mixup = True
+    
+if Noisy_mixup:
+    model.linear = nn.Linear(in_features=512, out_features=num_classes+1, bias=True)
 
 model = model.cuda()
 model = torch.nn.DataParallel(model)
 
-checkpoint = torch.load(f"{resume}")
+checkpoint = torch.load(f"{args.resume}")
 model.load_state_dict(checkpoint['net'])
 
 num_lines = 0
@@ -85,19 +84,20 @@ for i, (images, labels) in enumerate(train_loader):
     output = model(images)
     pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
 
-    labels_change = torch.randint(1, 10, (labels.shape[0],)).cuda()
-    wrong_labels = torch.remainder(labels_change + labels, 10)
+    labels_change = torch.randint(1, num_classes, (labels.shape[0],)).cuda()
+    wrong_labels = torch.remainder(labels_change + labels, num_classes)
     adv_images = PGD_attack.__call__(images, wrong_labels)
 
     for data_ind in range(labels.shape[0]):
-
-        ## Sample 128 points from each segment
 
         x1, x2 = images[data_ind], adv_images[data_ind]
         dist = torch.norm(x1 - x2, p=2)
 
         new_batch = []
 
+        ## Sample 128 points from each segment
+        ## This number can be changed to get better precision
+        
         num_points = 128
         for lmbd in np.linspace(0, 1.0, num=num_points):
             new_batch.append(x1 * lmbd + x2 * (1 - lmbd))

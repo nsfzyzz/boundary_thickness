@@ -15,7 +15,7 @@ parser.add_argument('--num-epochs', type=int, default = 200, help='number of tra
 parser.add_argument('--batch-size', type=int, default = 64, help='training bs')
 parser.add_argument('--lr-max', type=float, default = 0.01, help='learning rate')
 parser.add_argument('--test-batch-size', type=int, default = 200, help='testing bs')
-parser.add_argument('--file-prefix', type=str, default = "ResNet18_noisy_mixup", help='stored file name')
+parser.add_argument('--file-prefix', type=str, default = "ResNet18_cifar10_noisy_mixup", help='stored file name')
 
 args = parser.parse_args()
 

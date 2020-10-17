@@ -6,10 +6,10 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 
-from models.resnet import ResNet18
+from models.resnet import ResNet18, ResNet50
 from models.densenet import densenet_cifar
 from models.vgg import *
-from resnet_cifar import resnet20_cifar, resnet32_cifar, resnet44_cifar, resnet56_cifar, resnet110_cifar
+from models.resnet_cifar import resnet20_cifar, resnet32_cifar, resnet44_cifar, resnet56_cifar, resnet110_cifar
 
 from utils import *
 from tqdm import tqdm, trange
@@ -23,11 +23,11 @@ parser = argparse.ArgumentParser(description='PyTorch Example')
 parser.add_argument('--name', type=str, default='cifar10', metavar='N',
                     help='dataset')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 64)')
+                    help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=200, metavar='N',
-                    help='input batch size for testing (default: 1000)')
+                    help='input batch size for testing (default: 200)')
 parser.add_argument('--epochs', type=int, default=200, metavar='N',
-                    help='number of epochs to train (default: 10)')
+                    help='number of epochs to train (default: 200)')
 parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
                     help='learning rate (default: 0.1)')
 parser.add_argument('--lr-decay', type=float, default=0.1,
@@ -42,10 +42,12 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--weight-decay', '--wd', default=5e-4, type=float,
                     metavar='W', help='weight decay (default: 5e-4)')
-parser.add_argument('--arch', type=str, default='resnet',
+parser.add_argument('--arch', type=str, default='resnet20',
             help='choose the archtecure')
 parser.add_argument('--saving-folder', type=str, default='',
             help='the folder to save your model')
+parser.add_argument('--file-prefix', type=str, default='net',
+            help='the name of your model')
 
 args = parser.parse_args()
 # set random seed to reproduce the work
@@ -67,7 +69,7 @@ model_list = {
     'resnet56': resnet56_cifar(),
     'resnet110': resnet110_cifar(),
     'ResNet18': ResNet18(),
-    'ResNet50': ResNet50_with_link(),
+    'ResNet50': ResNet50(),
     'DenseNet': densenet_cifar(),
     'VGG11': VGG('VGG11'),
     'VGG13': VGG('VGG13'),
@@ -105,7 +107,7 @@ logging.basicConfig(filename=log,level=logging.DEBUG,format='%(asctime)s %(messa
 total_iter = 0
 best_acc = 0.0
 acc_tolerance = 0
-for epoch in range(1, args.epochs + 1):
+for epoch in range(args.epochs):
     print('Current Epoch: ', epoch)
     train_loss = 0.
     total_num = 0
@@ -141,7 +143,20 @@ for epoch in range(1, args.epochs + 1):
     logging.info(f"Training Loss of Epoch {epoch}: {train_loss}")
     logging.info(f"Testing of Epoch {epoch}: {acc}")
     scheduler.step()
-    torch.save(model.state_dict(), f'{args.saving_folder}net_{epoch}.pkl')  
+    
+    if (epoch + 1) % 20 == 0 or epoch <= 5:
+        print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch + 1, args.epochs, loss.item()))
 
+        acc = test(model, test_loader)
+
+        if acc > 0:
+            print('Saving model ' + '..')
+            state = {
+                'net': model.state_dict(),
+                'acc': acc,
+            }
+            if not os.path.isdir('checkpoint'):
+                os.mkdir('checkpoint')
+            torch.save(state, f'{args.saving_folder}{args.file_prefix}_epoch_{epoch}.ckpt')
 
 
