@@ -8,14 +8,24 @@ from utils import *
 
 
 parser = argparse.ArgumentParser(description='Training noisy mixup')
-parser.add_argument('--name', type=str, default = "cifar10", help='dataset')
-parser.add_argument('--alpha', type=float, default = 1.0, help='dataset')
-parser.add_argument('--noise-type', type=str, default = "Noisy", help='type of noise augmentation')
-parser.add_argument('--num-epochs', type=int, default = 200, help='number of training epochs')
-parser.add_argument('--batch-size', type=int, default = 64, help='training bs')
-parser.add_argument('--lr-max', type=float, default = 0.01, help='learning rate')
-parser.add_argument('--test-batch-size', type=int, default = 200, help='testing bs')
-parser.add_argument('--file-prefix', type=str, default = "ResNet18_cifar10_noisy_mixup", help='stored file name')
+parser.add_argument('--name', type=str, default = "cifar10", 
+                    help='dataset')
+parser.add_argument('--seed', type=int, default=1, 
+                    help='random seed (default: 1)')
+parser.add_argument('--alpha', type=float, default = 1.0, 
+                    help='dataset')
+parser.add_argument('--noise-type', type=str, default = "Noisy", 
+                    help='type of augmentation ("Noisy" means noisy mixup, "None" means ordinary mixup)')
+parser.add_argument('--num-epochs', type=int, default = 200, 
+                    help='number of training epochs')
+parser.add_argument('--batch-size', type=int, default = 64, 
+                    help='training bs')
+parser.add_argument('--lr-max', type=float, default = 0.01, 
+                    help='learning rate')
+parser.add_argument('--test-batch-size', type=int, default = 200, 
+                    help='testing bs')
+parser.add_argument('--file-prefix', type=str, default = "net", 
+                    help='stored file name')
 
 args = parser.parse_args()
 
@@ -23,14 +33,11 @@ for arg in vars(args):
     print(arg, getattr(args, arg))
 
 # Training settings
-seed = 1
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
+# set random seed to reproduce the work
+torch.manual_seed(args.seed)
+torch.cuda.manual_seed(args.seed)
 
 train_loader, test_loader = getData(name=args.name, train_bs=args.batch_size, test_bs=args.test_batch_size)
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device
 
 if args.name == "cifar10":
     model = ResNet18()
@@ -51,7 +58,7 @@ else:
 if Noisy_mixup:
     model.linear = nn.Linear(in_features=512, out_features=num_classes+1)
     
-model = model.to(device)
+model = model.cuda()
 
 model = torch.nn.DataParallel(model)
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
@@ -90,9 +97,11 @@ for epoch in range(args.num_epochs):
     for i, (inputs, targets) in enumerate(train_loader):
         
         if Noisy_mixup:
+            
             # generate random inputs
             inputs_random = torch.rand_like(inputs)
-            # normalize
+            
+            # normalize the random noise using Cifar mean and variance parameters
             inputs_random[:, 0, :, :] = (inputs_random[:, 0, :, :] - 0.4914) / 0.2023
             inputs_random[:, 1, :, :] = (inputs_random[:, 1, :, :] - 0.4822) / 0.1994
             inputs_random[:, 2, :, :] = (inputs_random[:, 2, :, :] - 0.4465) / 0.2010
@@ -103,8 +112,8 @@ for epoch in range(args.num_epochs):
             inputs = torch.cat([inputs, inputs_random])
             targets = torch.cat([targets, targets_random])
 
-        inputs = inputs.to(device)
-        targets = targets.to(device)
+        inputs = inputs.cuda()
+        targets = targets.cuda()
         # generate mixed inputs, two one-hot label vectors and mixing coefficient
         inputs, targets_a, targets_b, lam = mixup_data(inputs, targets, args.alpha, use_cuda)
         optimizer.zero_grad()

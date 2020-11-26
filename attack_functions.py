@@ -48,14 +48,10 @@ class Attacks(object):
             wrong_labels = torch.remainder(labels_change + labels, 10)
 
             adv_images = self.__call__(images, wrong_labels)
-            # adv_images = self.__call__(images, labels)
 
             if accuracy:
                 outputs = self.model(adv_images)
-                # print(outputs)
-
                 _, predicted = torch.max(outputs.data, 1)
-                # print(predicted)
 
                 total += labels.size(0)
                 correct += (predicted == labels.to(self.device)).sum()
@@ -76,10 +72,6 @@ class Attacks(object):
 
         x = torch.cat(image_list, 0)
         y = torch.cat(label_list, 0)
-
-        # torch.save((x, y), file_name)
-
-        # print('\n- Save Complete!')
 
         print("Return adversarial data.")
 

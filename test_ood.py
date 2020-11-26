@@ -11,22 +11,28 @@ from models.resnet import ResNet18
 from models.resnet_CIFAR100 import ResNet18 as ResNet18_CIFAR100
 import pickle
 
-parser = argparse.ArgumentParser(description='Measure ood error')
-parser.add_argument('--name', type=str, default = "cifar10", help='dataset')
-parser.add_argument('--noise-type', type=str, default = "Noisy", help='type of noise augmentation')
-parser.add_argument('--file-prefix', type=str, default = "ResNet18_cifar10_noisy_mixup", help='stored file name')
-parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", help='stored model name')
-parser.add_argument('--batch-size', type=int, default = 64, help='training bs')
-parser.add_argument('--test-batch-size', type=int, default = 100, help='testing bs')
+
+parser = argparse.ArgumentParser(description='Measure ood robustness')
+parser.add_argument('--name', type=str, default = "cifar10", 
+                    help='dataset')
+parser.add_argument('--noise-type', type=str, default = "Noisy", 
+                    help='type of augmentation ("Noisy" means noisy mixup, "None" means ordinary mixup)')
+parser.add_argument('--file-prefix', type=str, default = "result", 
+                    help='stored file name')
+parser.add_argument('--seed', type=int, default=1, 
+                    help='random seed (default: 1)')
+parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", 
+                    help='stored model name')
+parser.add_argument('--batch-size', type=int, default = 64, 
+                    help='training bs')
+parser.add_argument('--test-batch-size', type=int, default = 100, 
+                    help='testing bs')
 
 args = parser.parse_args()
-    
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device
 
-seed = 1
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
+# set random seed to reproduce the work
+torch.manual_seed(args.seed)
+torch.cuda.manual_seed(args.seed)
 
 softmax1 = nn.Softmax()
         
@@ -53,8 +59,7 @@ else:
 if Noisy_mixup:
     model.linear = nn.Linear(in_features=512, out_features=num_classes+1)
 
-model = torch.nn.DataParallel(model)    
-model = model.cuda()
+model = torch.nn.DataParallel(model).cuda()    
 model.load_state_dict(torch.load(f"{args.resume}")['net'])
 
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))

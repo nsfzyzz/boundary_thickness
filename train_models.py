@@ -19,42 +19,41 @@ import os
 import sys
 
 # Training settings
-parser = argparse.ArgumentParser(description='PyTorch Example')
+parser = argparse.ArgumentParser(description='Train models using empirical risk minimization')
 parser.add_argument('--name', type=str, default='cifar10', metavar='N',
                     help='dataset')
-parser.add_argument('--batch-size', type=int, default=128, metavar='N',
+parser.add_argument('--batch-size', type=int, default=128, metavar='BS',
                     help='input batch size for training (default: 128)')
-parser.add_argument('--test-batch-size', type=int, default=200, metavar='N',
+parser.add_argument('--test-batch-size', type=int, default=200, metavar='BT',
                     help='input batch size for testing (default: 200)')
-parser.add_argument('--epochs', type=int, default=200, metavar='N',
+parser.add_argument('--epochs', type=int, default=200, metavar='E',
                     help='number of epochs to train (default: 200)')
 parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
                     help='learning rate (default: 0.1)')
 parser.add_argument('--lr-decay', type=float, default=0.1,
                     help='learning rate ratio')
 parser.add_argument('--lr-decay-epoch', type=int, nargs='+', default=[100,150],
-                        help='Decrease learning rate at these epochs.')
+                    help='Decrease learning rate at these epochs.')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--resume', type=str, default='',
-            help='choose model')
+                    help='choose model')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--weight-decay', '--wd', default=5e-4, type=float,
                     metavar='W', help='weight decay (default: 5e-4)')
 parser.add_argument('--arch', type=str, default='resnet20',
-            help='choose the archtecure')
+                    help='choose the archtecure')
 parser.add_argument('--saving-folder', type=str, default='',
-            help='the folder to save your model')
+                    help='the folder to save your model')
 parser.add_argument('--file-prefix', type=str, default='net',
-            help='the name of your model')
+                    help='the name of your model')
 
 args = parser.parse_args()
+
 # set random seed to reproduce the work
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)
-
-
 
 for arg in vars(args):
     print(arg, getattr(args, arg))
@@ -62,6 +61,7 @@ for arg in vars(args):
 # get dataset
 train_loader, test_loader = getData(name=args.name, train_bs=args.batch_size, test_bs=args.test_batch_size)
 
+# The following lists all the models that we have used in our paper
 model_list = {
     'resnet20': resnet20_cifar(),
     'resnet32': resnet32_cifar(),

@@ -20,32 +20,32 @@ cd boundary_thickness/
 ```
 
 ### Measure boundary thickness
-To measure boundary thickness, please use the following code:
+To measure boundary thickness, please use the following command. If you don't give the checkpoint path, you will evaluate the downloaded example.
 
 ```
-python measure_thickness.py
+python measure_thickness.py --resume [Your_checkpoint_path]
 ```
 
 ### Evaluate adversarial robustness:
-To measure the adversarial robustness of a model, please use one of the following python codes:
+To measure the adversarial robustness of a model, please use one of the following commands. If you don't give the checkpoint path, you will evaluate the downloaded example.
 
 ```
-python test_pgd.py
-python test_bb.py
+python test_pgd.py --resume [Your_checkpoint_path]
+python test_bb.py --resume [Your_checkpoint_path]
 ```
 
 ### Evaluate ood robustness 
-To measure the out-of-distribution generalization of a model on CIFAR10-C or CIFAR100-C, please use the following code:
+To measure the out-of-distribution generalization of a model on CIFAR10-C or CIFAR100-C, please use the following command. If you don't give the checkpoint path, you will evaluate the downloaded example.
 
 ```
-python test_ood.py
+python test_ood.py --resume [Your_checkpoint_path]
 ```
 
 ### Train noisy mixup
-To train a model using mixup or noisy mixup, please use the following code:
+To train a model using noisy mixup, please use the following code.
 
 ```
-python noisy_mixup.py
+python noisy_mixup.py --noise-type Noisy
 ```
 
 ### Train ERM model
@@ -56,10 +56,10 @@ python train_models.py --saving-folder [Your_folder] --arch [Your_model_choice]
 ```
 
 ### 3D visualization
-Please use the following code to see an example of visualizing 3D decision boundary:
+Please use the following code to visualize 3D decision boundary. If you don't give the checkpoint path, you will evaluate the downloaded example.
 
 ```
-python visualize_3D.py
+python visualize_3D.py --resume [Your_checkpoint_path]
 ```
 
 ### Chessboard toy example
