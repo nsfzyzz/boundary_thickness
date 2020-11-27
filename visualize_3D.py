@@ -17,7 +17,7 @@ parser.add_argument('--test-batch-size', type=int, default = 128,
                     help='testing bs')
 parser.add_argument('--file-prefix', type=str, default = "new_plot", 
                     help='stored file name')
-parser.add_argument('--resume', type=str, default ="./checkpoint/resnet56_cifar10.ckpt", 
+parser.add_argument('--ckpt', type=str, default ="./checkpoint/resnet56_cifar10.ckpt", 
                     help='stored model name')
 
 args = parser.parse_args()
@@ -33,7 +33,7 @@ lens = [[-20, 20],[-20, 20],[-20, 20]]
 
 model = resnet56_cifar().cuda()
 model = torch.nn.DataParallel(model)
-ckpt_path = args.resume
+ckpt_path = args.ckpt
 model.load_state_dict(torch.load(ckpt_path))
 
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))

@@ -21,7 +21,7 @@ parser.add_argument('--file-prefix', type=str, default = "result",
                     help='stored file name')
 parser.add_argument('--seed', type=int, default=1, 
                     help='random seed (default: 1)')
-parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", 
+parser.add_argument('--ckpt', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", 
                     help='stored model name')
 parser.add_argument('--batch-size', type=int, default = 64, 
                     help='training bs')
@@ -36,7 +36,7 @@ torch.cuda.manual_seed(args.seed)
 
 softmax1 = nn.Softmax()
         
-print("Testing OOD: {0}".format(args.resume))
+print("Testing OOD: {0}".format(args.ckpt))
 
 if args.name == "cifar10":
     model = ResNet18()
@@ -60,10 +60,10 @@ if Noisy_mixup:
     model.linear = nn.Linear(in_features=512, out_features=num_classes+1)
 
 model = torch.nn.DataParallel(model).cuda()    
-model.load_state_dict(torch.load(f"{args.resume}")['net'])
+model.load_state_dict(torch.load(f"{args.ckpt}")['net'])
 
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
-print("Finished loading {0}".format(args.resume))
+print("Finished loading {0}".format(args.ckpt))
 
 transform_test = transforms.Compose([
         transforms.ToTensor(),

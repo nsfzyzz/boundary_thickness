@@ -28,7 +28,7 @@ parser.add_argument('--step-size', default=0.0031, type=float,
                     help='perturb step size')
 parser.add_argument('--file-prefix', type=str, default = "result", 
                     help='stored file name')
-parser.add_argument('--resume', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", 
+parser.add_argument('--ckpt', type=str, default = "./checkpoint/ResNet18_mixup_cifar10_type_Noisy.ckpt", 
                     help='stored model name')
 parser.add_argument('--batch-size', type=int, default = 64, 
                     help='training bs')
@@ -91,7 +91,7 @@ torch.cuda.manual_seed(args.seed)
 
 softmax1 = nn.Softmax()
         
-print("Testing Black Box: {0}".format(args.resume))
+print("Testing Black Box: {0}".format(args.ckpt))
 
 if args.name == "cifar10":
     model = ResNet18()
@@ -127,10 +127,10 @@ elif args.name == "cifar100":
 model_source.load_state_dict(torch.load(f"{source_resume}"))
 
 model = torch.nn.DataParallel(model).cuda()
-model.load_state_dict(torch.load(f"{args.resume}")['net'])
+model.load_state_dict(torch.load(f"{args.ckpt}")['net'])
 
 print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
-print("Finished loading {0}".format(args.resume))
+print("Finished loading {0}".format(args.ckpt))
 
 train_loader, test_loader = getData(name=args.name, train_bs=args.batch_size, test_bs=args.test_batch_size)
 
