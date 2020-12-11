@@ -52,6 +52,8 @@ parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
 parser.add_argument('--file-prefix', type=str, default = "result", 
                     help='stored file name')
+parser.add_argument('--gpu', default=None, type=str,
+                    help='id(s) for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
 
@@ -59,6 +61,10 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)
 
+if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+if args.gpu:
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 def calculate_thickness(train_loader, model, PGD_attack, num_classes, args):
     

@@ -7,6 +7,7 @@ import plotly
 from attack_functions import *
 from utils import *
 from utils3d import *
+import os
 
 parser = argparse.ArgumentParser(description='Visualize 3D models')
 parser.add_argument('--seed', type=int, default=1, 
@@ -19,12 +20,18 @@ parser.add_argument('--file-prefix', type=str, default = "new_plot",
                     help='stored file name')
 parser.add_argument('--ckpt', type=str, default ="./checkpoint/resnet56_cifar10.ckpt", 
                     help='stored model name')
+parser.add_argument('--gpu', default=None, type=str,
+                    help='id(s) for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
 
 for arg in vars(args):
     print(arg, getattr(args, arg))
 
+if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+if args.gpu:
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)

@@ -9,6 +9,7 @@ from utils import *
 from models.resnet import ResNet18
 from models.resnet_CIFAR100 import ResNet18 as ResNet18_CIFAR100
 import pickle
+import os
 
 
 parser = argparse.ArgumentParser(description='Measure pgd robustness')
@@ -32,8 +33,15 @@ parser.add_argument('--batch-size', type=int, default = 64,
                     help='training bs')
 parser.add_argument('--test-batch-size', type=int, default = 100, 
                     help='testing bs')
+parser.add_argument('--gpu', default=None, type=str,
+                    help='id(s) for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
+
+if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+if args.gpu:
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 def _pgd_whitebox(model,
                   X,

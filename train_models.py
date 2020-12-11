@@ -48,6 +48,8 @@ parser.add_argument('--saving-folder', type=str, default='',
                     help='the folder to save your model')
 parser.add_argument('--file-prefix', type=str, default='net',
                     help='the name of your model')
+parser.add_argument('--gpu', default=None, type=str,
+                    help='id(s) for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
 
@@ -57,6 +59,11 @@ torch.cuda.manual_seed(args.seed)
 
 for arg in vars(args):
     print(arg, getattr(args, arg))
+    
+if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+if args.gpu:
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 # get dataset
 train_loader, test_loader = getData(name=args.name, train_bs=args.batch_size, test_bs=args.test_batch_size)

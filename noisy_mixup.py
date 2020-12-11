@@ -26,11 +26,18 @@ parser.add_argument('--test-batch-size', type=int, default = 200,
                     help='testing bs')
 parser.add_argument('--file-prefix', type=str, default = "net", 
                     help='stored file name')
+parser.add_argument('--gpu', default=None, type=str,
+                    help='id(s) for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
 
 for arg in vars(args):
     print(arg, getattr(args, arg))
+    
+if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+if args.gpu:
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 # Training settings
 # set random seed to reproduce the work
@@ -110,7 +117,7 @@ for epoch in range(args.num_epochs):
             targets_random = torch.ones_like(targets) * 10.0
 
             inputs = torch.cat([inputs, inputs_random])
-            targets = torch.cat([targets, targets_random])
+            targets = torch.cat([targets, targets_random.long()])
 
         inputs = inputs.cuda()
         targets = targets.cuda()
